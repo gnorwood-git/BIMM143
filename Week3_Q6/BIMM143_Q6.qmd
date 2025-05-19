@@ -1,0 +1,63 @@
+```{r}
+#install.packages("tinytex")
+#tinytex::install_tinytex()
+```
+
+---
+title: "Q6 Homework"
+author: "Griffin Norwood"
+---
+
+I named it 'generate_drug_interactions" because I thought that is what we were doing. I know we have to use the "function()" to find "pdb" so i plugged that in (that took me the longest to figure out, I left it empty most of the time).
+
+This next part I did have to look up a lot for, I couldn't remember how to do a loop or if we did learn how at some point. So I browsed the internet to find that if you use "for (vector in vector) that would avoid the manual inputs Q6 did. This took trial in error before I got it to work, maybe there was a way in class that would've worked better that I forgot instead of brute forcing this code.
+
+```{r}
+# generate_drug_interactions <- function(pdb) {
+# for (pdb.file in pdb) {...}...}
+```
+
+This next portion was just a compression of what Q6 presented, didn't know if it had a better name so instead of s1,s2,etc.. I just made the 's#' variables throughout the manual plotting "sN" instead, which seemed fitting. The rest was literally just copying their code (HA)! Not sure if I was supposed to fix that part but it seemed like it worked anyways.
+
+```{r}
+  #sN <-read.pdb(pdb.file) 
+  
+  #sN.chainA <-trim.pdb(sN, chain="A", elety="CA")
+  
+  #sN.b <- sN.chainA$atom$b
+```
+
+This part I couldn't figure out why it would work when I ran the original Q6 code; specifically the typ="1", whenever I would use that it game me an error so I just defaulted to bar graphs. Still very similar, I hope that's ok!
+
+```{r}
+ #plotb3(sN.b, sse=sN.chainA, ylab="Bfactor")
+```
+
+Here is the full function
+
+```{r}
+#standard install packages and access library
+#install.packages("bio3d")
+library(bio3d)
+
+generate_drug_interactions <- function(pdb) {
+  for (pdb.file in pdb) {
+
+  sN <-read.pdb(pdb.file) 
+  
+  sN.chainA <-trim.pdb(sN, chain="A", elety="CA")
+  
+  sN.b <- sN.chainA$atom$b
+
+  plotb3(sN.b, sse=sN.chainA, ylab="Bfactor")  
+  
+  }
+}
+```
+
+I figured I would just use the same pdb.file(s) that they used for comparison, so I just made pdb a vector of the 3. I'm not quite sure how this works if I am being honest, the program just knows what I am talking about when I use pdb? Or is it because of the value giving to pdb (from the vector) that this works?
+
+```{r}
+pdb<- c("4AKE","1AKE", "1EAY")
+generate_drug_interactions(pdb)
+```

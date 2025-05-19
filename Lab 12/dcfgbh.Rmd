@@ -1,0 +1,37 @@
+---
+title: "Class 12"
+author: "Griffin Norwood"
+date: "2025-05-09"
+output: html_document
+---
+
+## Section 1. Portion of G/G in a popualation
+
+Downloaded a CSV file from Ensemble, now we read the csv file; 
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)/nrow(mxl) *100
+```
+
+Now let us look at a different population. I picked the GBR.
+
+```{r}
+gbr <- read.csv("373522-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+```
+
+Find portion of G|G
+
+```{r}
+table(gbr$Genotype..forward.strand.)/ nrow(gbr) * 100 
+```
+This variant that is associated with childhood asthma is more frequent in the GBR population than the MKL popualtion.
+
+Now to look further in. 

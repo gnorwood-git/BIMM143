@@ -1,0 +1,39 @@
+---
+title: "Lab 12 Homework"
+author: "Griffin Norwood"
+date: "2025-05-14"
+output: pdf_document
+---
+
+## question 13 
+
+Reading the data file into R (I messed up here and did not realize I should have been reading this file in as a "read.table", I was using "read.csv" and spent the past 2 days trying to figure out how to get this working. I watched the video all the way through and saw my mistake. I feel silly!)
+
+```{r}
+orm <- read.table("rs8067378_ENSG00000172057.6.txt")
+head(orm)
+```
+It worked, great! I've been having trouble with that recently. Time to determine the sample sizes for each genotype;
+
+```{r}
+table(orm$geno)
+```
+Ok, sweet that works! I remembered this from today's lab 13 (which is after, but it's still cool that I remember). Time for median;
+
+```{r}
+tapply(orm$exp, orm$geno, median)
+```
+
+## Question 14: Boxplot
+```{r}
+library(ggplot2)
+
+ggplot(orm)+
+  aes(geno, exp)+
+  geom_boxplot()+
+  labs(x= "Genotype", y= "Expression")+
+  theme_bw()
+```
+
+I read that this does not need to be flashy, I am tired and have spent a long time just trying to open the file correctly! But this is cute none-the-less!
+

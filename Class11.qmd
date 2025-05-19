@@ -1,0 +1,203 @@
+---
+title: "Lab 11: Comparative Structure Analysis"
+author: "Griffin Norwood"
+format: html
+toc: true
+---
+
+## Finishing Work From Class 10
+Loading in analysis packages for the protein structure sets:
+```{r}
+#install.packages("bio3d")
+#install.packages("NGLVieweR")
+
+#install.packages("pak")
+#pak::pak("bioboot/bio3dview")
+
+#install.packages("BiocManager")
+#BiocManager::install("msa")
+```
+
+We will analyze the ADK starting with a singe ADK database accession code: "1ake_A"
+```{r}
+library(bio3d)
+id <- "1ake_A"
+aa <- get.seq("1ake_A")
+aa
+```
+Now we search the PDB database to find all related entries.
+```{r}
+blast <- blast.pdb(aa)
+#blast
+```
+```{r}
+attributes(blast)
+```
+```{r}
+head(blast$hit.tbl)
+```
+Making a little summary figure of these results:
+
+```{r}
+hits <- plot(blast)
+hits
+```
+Out "top hits" i.e. the most similar entries in the databse are:
+```{r}
+hits$pdb.id
+```
+
+Making a zip file of all these entries using this code:
+```{r}
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+```
+
+Align and supperpose all these structures
+```{r}
+pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
+```
+
+Side note:
+```{r}
+library(bio3dview)
+view.pdbs(pdbs)
+```
+
+This is better but still difficult to see what is similar and different in all these structures or indeed learn much about how this family works.
+
+Let's try PCA:
+
+```{r}
+pc <- pca(pdbs)
+plot(pc)
+```
+
+```{r}
+plot(pc, pc.axes = 1:2)
+```
+
+```{r}
+view.pca(pc)
+```
+
+Write out a PDB "trajectory" for mol-star
+```{r}
+mktrj(pc, file= "pca_results.pdb")
+```
+
+## Class 11: Structural Analysis
+
+Jumping to Section 6!
+
+## Section 6: Generating our own structure predictions
+
+Here we read the results from Alphafold and try to interpret all the models and quality score metrics:
+
+```{r}
+library(bio3d)
+pth <- "betterdimer_23119/"
+pdb.files <- list.files(path=pth, full.names = TRUE, pattern= ".pdb")
+```
+
+Align and supperpose all these models
+```{r}
+#just checking that the files are in the correct spot
+file.exists(pdb.files)
+```
+
+```{r}
+pdbs <- pdbaln(pdb.files, fit = TRUE, exefile="msa")
+```
+
+```{r}
+library(bio3dview)
+view.pdbs(pdbs)
+```
+
+```{r}
+plot(pdbs$b[1,], typ="l", ylim=c(0,100), ylab = "pLDDT score") +
+lines(pdbs$b[2,], typ="l", col="green") +
+lines(pdbs$b[3,], typ="l", col="red") +
+lines(pdbs$b[4,], typ="l", col="yellow") +
+lines(pdbs$b[5,], typ="l", col="blue")
+```
+
+## Custom analysis of resulting models
+
+```{r}
+results_dir <- "betterdimer_23119/" 
+aln_file <- list.files(path=results_dir,
+                       pattern=".a3m$",
+                        full.names = TRUE)
+aln_file
+```
+
+```{r}
+library(jsonlite)
+
+# Listing of all PAE JSON files
+pae_files <- list.files(path=results_dir,
+                        pattern=".*model.*\\.json",
+                        full.names = TRUE)
+
+pae1 <- read_json(pae_files[1],simplifyVector = TRUE)
+pae5 <- read_json(pae_files[5],simplifyVector = TRUE)
+
+attributes(pae1)
+
+head(pae1$plddt)
+```
+```{r}
+pae1$max_pae
+```
+
+```{r}
+pae5$max_pae
+```
+
+```{r}
+plot.dmat(pae1$pae, 
+          xlab="Residue Position (i)",
+          ylab="Residue Position (j)")
+```
+
+```{r}
+plot.dmat(pae5$pae, 
+          xlab="Residue Position (i)",
+          ylab="Residue Position (j)",
+          grid.col = "black",
+          zlim=c(0,30))
+```
+```{r}
+pdb <- read.pdb("1hsg")
+```
+
+## Residue Conservation from alignment file
+
+```{r}
+aln_file <- list.files(path=results_dir,
+                       pattern=".a3m$",
+                        full.names = TRUE)
+aln_file
+```
+
+```{r}
+aln <- read.fasta(aln_file[1], to.upper = TRUE)
+```
+
+```{r}
+dim(aln$ali)
+```
+
+```{r}
+sim <- conserv(aln)
+plotb3(sim[1:99], sse=trim.pdb(pdb, chain="A"),
+       ylab="Conservation Score")
+```
+
+Find the consensus sequence:
+```{r}
+con <- consensus(aln, cutoff = 0.9)
+con$seq
+```
+

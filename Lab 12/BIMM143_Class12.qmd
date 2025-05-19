@@ -1,0 +1,8 @@
+---
+title: "Class 12: Genome Informatics Lab"
+author: "Griffin Norwood"
+format: html
+toc: TRUE
+---
+
+## Identify genetic variants of interest
